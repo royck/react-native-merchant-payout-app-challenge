@@ -12,8 +12,14 @@ export function useMSW() {
         // Server imports polyfills automatically, so we can import directly
         const { server } = await import('./server');
 
-        console.log('Starting MSW server', server);
-        server.listen();
+        server.listen({
+          onUnhandledRequest: (request, print) => {
+            if (new URL(request.url).pathname === '/symbolicate') {
+              return;
+            }
+            print.warning();
+          },
+        });
         setIsReady(true);
       };
 

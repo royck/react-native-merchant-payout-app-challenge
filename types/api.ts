@@ -45,7 +45,7 @@ export interface CreatePayoutRequest {
   amount: number; // in lowest denomination of the currency
   currency: Currency;
   iban: string;
-  device_id?: string;
+  device_id: string;
 }
 
 export interface PayoutResponse {

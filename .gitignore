@@ -10,9 +10,20 @@ yarn-error.log*
 dist/
 web-build/
 
-# Native
+# Generated native projects from Expo prebuild
+/android/
+/ios/
+
+# Native module build output
+/modules/screen-security/android/.gradle/
+/modules/screen-security/android/build/
+/modules/screen-security/ios/Pods/
+/modules/screen-security/ios/build/
+
+# Native signing files
 *.orig.*
 *.jks
+*.keystore
 *.p8
 *.p12
 *.key

@@ -42,11 +42,12 @@ if (typeof global.EventTarget === 'undefined') {
 
 // Polyfill Event for React Native (required by MessageEvent)
 if (typeof global.Event === 'undefined') {
+  const defaultPreventedStates = new WeakMap<object, boolean>();
+
   (global as any).Event = class Event {
     type: string;
     bubbles: boolean;
     cancelable: boolean;
-    defaultPrevented: boolean;
     eventPhase: number;
     timeStamp: number;
     target: any;
@@ -57,7 +58,7 @@ if (typeof global.Event === 'undefined') {
       this.type = type;
       this.bubbles = eventInitDict?.bubbles ?? false;
       this.cancelable = eventInitDict?.cancelable ?? false;
-      this.defaultPrevented = false;
+      defaultPreventedStates.set(this, false);
       this.eventPhase = 0;
       this.timeStamp = Date.now();
       this.target = null;
@@ -65,9 +66,13 @@ if (typeof global.Event === 'undefined') {
       this.isTrusted = false;
     }
 
+    get defaultPrevented() {
+      return defaultPreventedStates.get(this) ?? false;
+    }
+
     preventDefault() {
       if (this.cancelable) {
-        this.defaultPrevented = true;
+        defaultPreventedStates.set(this, true);
       }
     }
 

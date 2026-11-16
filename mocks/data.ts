@@ -222,8 +222,6 @@ const baseActivities: Omit<ActivityItem, 'currency'>[] = [
   },
 ];
 
-// Track request count to add new activities
-let requestCount = 0;
 let activityCounter = 16; // Start from act_016
 
 // Generate a large pool of activities for pagination
