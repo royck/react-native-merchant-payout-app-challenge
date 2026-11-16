@@ -11,26 +11,20 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      screenOptions={{
+      screenOptions={({ route }) => ({
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tabIconSelected,
         tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
         headerShown: false,
         tabBarButton: HapticTab,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="payouts"
-        options={{
-          title: 'Payouts',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="arrow.up.circle.fill" color={color} />,
-        }}
-      />
-    </Tabs>
+        title: route.name === 'index' ? 'Home' : 'Payouts',
+        tabBarIcon: ({ color }) => (
+          <IconSymbol
+            size={28}
+            name={route.name === 'index' ? 'house.fill' : 'arrow.up.circle.fill'}
+            color={color}
+          />
+        ),
+      })}
+    />
   );
 }
