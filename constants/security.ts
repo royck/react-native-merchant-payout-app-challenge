@@ -1,0 +1,1 @@
+export const PAYOUT_BIOMETRIC_THRESHOLD = 100_000;
