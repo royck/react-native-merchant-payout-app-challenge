@@ -164,6 +164,19 @@ describe('PayoutScreen critical flows', () => {
     expect(lastPayoutRequest).toMatchObject({ amount: 100_001 });
   });
 
+  it('sends the selected currency in the payout request', async () => {
+    watchPayoutRequests();
+    renderPayoutScreen();
+
+    fireEvent.press(screen.getByLabelText('Currency, GBP'));
+    fireEvent.press(screen.getByRole('menuitem', { name: 'EUR' }));
+    await enterPayout('10.00');
+    fireEvent.press(screen.getByRole('button', { name: 'Confirm and send' }));
+
+    expect(await screen.findByText('Payout submitted')).toBeTruthy();
+    expect(lastPayoutRequest).toMatchObject({ currency: 'EUR' });
+  });
+
   it.each([
     ['999.99', 'temporarily unavailable'],
     ['888.88', 'Insufficient funds'],

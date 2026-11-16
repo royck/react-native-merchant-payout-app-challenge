@@ -1,16 +1,17 @@
-import { Controller, type Control, type FieldErrors } from 'react-hook-form';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Controller, type Control, type FieldErrors } from "react-hook-form";
+import { Pressable, StyleSheet, TextInput, View } from "react-native";
 
-import { ThemedText } from '@/components/themed-text';
-import { colors, radius, sizes, spacing, typography } from '@/theme/tokens';
-import type { PayoutDraft } from '@/features/payout/schema';
+import { ThemedText } from "@/components/themed-text";
+import { colors, radius, sizes, spacing, typography } from "@/theme/tokens";
+import type { PayoutDraft } from "@/features/payout/schema";
+import { CurrencyDropdown } from "@/features/payout/components/CurrencyDropdown";
 
 interface PayoutFormProps {
   control: Control<PayoutDraft>;
   errors: FieldErrors<PayoutDraft>;
   isValid: boolean;
-  currency: PayoutDraft['currency'];
-  onCurrencyChange: (currency: PayoutDraft['currency']) => void;
+  currency: PayoutDraft["currency"];
+  onCurrencyChange: (currency: PayoutDraft["currency"]) => void;
   onSubmit: () => void;
 }
 
@@ -24,56 +25,41 @@ export function PayoutForm({
 }: PayoutFormProps) {
   return (
     <View style={styles.card}>
-      <ThemedText style={styles.label}>Amount</ThemedText>
-      <View style={styles.amountInputRow}>
-        <Controller
-          control={control}
-          name="amount"
-          render={({ field: { onBlur, onChange, value } }) => (
-            <TextInput
-              accessibilityLabel="Payout amount"
-              accessibilityHint={errors.amount?.message ?? 'Enter the payout amount'}
-              style={styles.amountInput}
-              value={value}
-              onBlur={onBlur}
-              onChangeText={onChange}
-              keyboardType="decimal-pad"
-              placeholder="0.00"
-              placeholderTextColor={colors.textPlaceholder}
-              maxLength={14}
+      <View style={styles.amountCurrencyRow}>
+        <View style={styles.amountField}>
+          <ThemedText style={styles.label}>Amount</ThemedText>
+          <View style={styles.amountInputRow}>
+            <Controller
+              control={control}
+              name="amount"
+              render={({ field: { onBlur, onChange, value } }) => (
+                <TextInput
+                  accessibilityLabel="Payout amount"
+                  accessibilityHint={
+                    errors.amount?.message ?? "Enter the payout amount"
+                  }
+                  style={styles.amountInput}
+                  value={value}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  keyboardType="decimal-pad"
+                  placeholder="0.00"
+                  placeholderTextColor={colors.textPlaceholder}
+                  maxLength={14}
+                />
+              )}
             />
-          )}
-        />
-        <ThemedText style={styles.currencyMark}>
-          {currency === 'GBP' ? '£' : '€'}
-        </ThemedText>
+            <ThemedText style={styles.currencyMark}>
+              {currency === "GBP" ? "£" : "€"}
+            </ThemedText>
+          </View>
+        </View>
+        <View style={styles.currencyField}>
+          <ThemedText style={styles.label}>Currency</ThemedText>
+          <CurrencyDropdown value={currency} onChange={onCurrencyChange} />
+        </View>
       </View>
       <FieldError message={errors.amount?.message} />
-
-      <ThemedText style={styles.label}>Currency</ThemedText>
-      <View style={styles.currencyOptions}>
-        {(['GBP', 'EUR'] as const).map((option) => (
-          <Pressable
-            accessibilityRole="radio"
-            accessibilityState={{ selected: currency === option }}
-            key={option}
-            onPress={() => onCurrencyChange(option)}
-            style={[
-              styles.currencyOption,
-              currency === option && styles.currencyOptionSelected,
-            ]}
-          >
-            <ThemedText
-              style={[
-                styles.currencyOptionText,
-                currency === option && styles.currencyOptionTextSelected,
-              ]}
-            >
-              {option === 'GBP' ? '£  GBP' : '€  EUR'}
-            </ThemedText>
-          </Pressable>
-        ))}
-      </View>
 
       <ThemedText style={styles.label}>Destination IBAN</ThemedText>
       <Controller
@@ -82,7 +68,9 @@ export function PayoutForm({
         render={({ field: { onBlur, onChange, value } }) => (
           <TextInput
             accessibilityLabel="Destination IBAN"
-            accessibilityHint={errors.iban?.message ?? 'Enter the recipient IBAN'}
+            accessibilityHint={
+              errors.iban?.message ?? "Enter the recipient IBAN"
+            }
             autoCapitalize="characters"
             autoCorrect={false}
             value={value}
@@ -125,41 +113,47 @@ function FieldError({ message }: { message?: string }) {
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: colors.surface, borderRadius: radius.largeCard, padding: spacing.xl },
-  label: { ...typography.small, color: colors.textBody, fontWeight: '700', marginBottom: spacing.sm },
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.largeCard,
+    padding: spacing.xl,
+  },
+  label: {
+    ...typography.small,
+    color: colors.textBody,
+    fontWeight: "700",
+    marginBottom: spacing.sm,
+  },
+  amountCurrencyRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: spacing.md,
+    marginBottom: spacing.xl,
+  },
+  amountField: { flex: 1, minWidth: 0 },
+  currencyField: { position: "relative", zIndex: 2 },
   amountInputRow: {
     minHeight: spacing.amountControl,
     borderColor: colors.border,
     borderWidth: 1,
     borderRadius: radius.button,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: spacing.mdPlus,
     paddingVertical: spacing.xs,
-    marginBottom: spacing.xl,
   },
   amountInput: {
     ...typography.title,
     flex: 1,
     color: colors.text,
-    fontWeight: '600',
+    fontWeight: "600",
     paddingVertical: spacing.xs,
   },
-  currencyMark: { ...typography.title, color: colors.textSecondary, fontWeight: '600' },
-  currencyOptions: { flexDirection: 'row', gap: spacing.sm, marginBottom: spacing.xl },
-  currencyOption: {
-    flex: 1,
-    minHeight: sizes.touchTarget,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: radius.medium,
-    padding: spacing.md,
-    alignItems: 'center',
-    justifyContent: 'center',
+  currencyMark: {
+    ...typography.title,
+    color: colors.textSecondary,
+    fontWeight: "600",
   },
-  currencyOptionSelected: { borderColor: colors.primary, backgroundColor: colors.surfaceMuted },
-  currencyOptionText: { ...typography.small, color: colors.textSecondary, fontWeight: '600' },
-  currencyOptionTextSelected: { color: colors.primary },
   ibanInput: {
     ...typography.body,
     minHeight: sizes.touchTarget + spacing.sm,
@@ -172,16 +166,24 @@ const styles = StyleSheet.create({
     ...typography.iban,
     marginBottom: spacing.xs,
   },
-  validationError: { ...typography.caption, color: colors.error, marginBottom: spacing.sm },
+  validationError: {
+    ...typography.caption,
+    color: colors.error,
+    marginBottom: spacing.sm,
+  },
   primaryButton: {
     minHeight: sizes.touchTarget + spacing.sm,
     borderRadius: radius.button,
     backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: spacing.lg,
     marginTop: spacing.lg,
   },
   buttonDisabled: { backgroundColor: colors.primaryDisabled },
-  primaryButtonText: { ...typography.base, color: colors.onPrimary, fontWeight: '700' },
+  primaryButtonText: {
+    ...typography.base,
+    color: colors.onPrimary,
+    fontWeight: "700",
+  },
 });
