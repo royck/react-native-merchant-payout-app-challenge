@@ -1,4 +1,5 @@
-import { server } from './mocks/server.test';
+import { afterAll, afterEach, beforeAll } from '@jest/globals';
+import { server } from './mocks/server.jest';
 
 // Establish API mocking before all tests
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
