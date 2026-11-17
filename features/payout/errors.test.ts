@@ -19,6 +19,10 @@ describe('mapPayoutError', () => {
     expect(mapPayoutError(new Error('Unexpected error')).kind).toBe('unknown');
   });
 
+  it('maps unexpected server errors to the generic failure category', () => {
+    expect(mapPayoutError(new ApiError('Internal server error', 500)).kind).toBe('unknown');
+  });
+
   it('maps coded biometric errors without relying on native error messages', () => {
     expect(mapPayoutError({ code: 'ERR_BIOMETRIC_NOT_ENROLLED' }).kind)
       .toBe('biometric-not-enrolled');

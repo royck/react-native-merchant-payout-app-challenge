@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { http, HttpResponse } from 'msw';
+import { KeyboardAvoidingView, ScrollView } from 'react-native';
 import {
   getDeviceId,
   isBiometricAuthenticated,
@@ -103,6 +104,14 @@ afterEach(() => {
 });
 
 describe('PayoutScreen critical flows', () => {
+  it('keeps form taps enabled while the keyboard is open', () => {
+    renderPayoutScreen();
+
+    expect(screen.UNSAFE_getByType(ScrollView).props.keyboardShouldPersistTaps)
+      .toBe('handled');
+    expect(screen.UNSAFE_getByType(KeyboardAvoidingView)).toBeTruthy();
+  });
+
   it('does not send a payout when biometric authentication is cancelled', async () => {
     watchPayoutRequests();
     mockIsBiometricAuthenticated.mockResolvedValue(false);
@@ -177,7 +186,41 @@ describe('PayoutScreen critical flows', () => {
     expect(lastPayoutRequest).toMatchObject({ currency: 'EUR' });
   });
 
+  it('rejects the invalid README IBAN example and keeps review disabled', async () => {
+    renderPayoutScreen();
+
+    fireEvent.changeText(screen.getByLabelText('Payout amount'), '10.00');
+    fireEvent.changeText(
+      screen.getByLabelText('Destination IBAN'),
+      'FR1212345123451234567A12310131231231231'
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: 'Review payout' }).props.accessibilityState?.disabled
+      ).toBe(true);
+    });
+    expect(screen.getByText('Enter a valid IBAN, including its check digits.')).toBeTruthy();
+  });
+
+  it('shows the generic failure for an unexpected HTTP 500', async () => {
+    server.use(
+      http.post(`${API_BASE_URL}/api/payouts`, () =>
+        HttpResponse.json({ error: 'Internal server error' }, { status: 500 })
+      )
+    );
+    renderPayoutScreen();
+
+    await enterPayout('10.00');
+    fireEvent.press(screen.getByRole('button', { name: 'Confirm and send' }));
+
+    expect(await screen.findByText('Internal server error')).toBeTruthy();
+    expect(screen.queryByText(/Insufficient funds/i)).toBeNull();
+    expect(screen.queryByText(/temporarily unavailable/i)).toBeNull();
+  });
+
   it.each([
+    ['777.77', 'Internal server error'],
     ['999.99', 'temporarily unavailable'],
     ['888.88', 'Insufficient funds'],
   ])('shows the correct mock-trigger error for %s', async (amount, message) => {

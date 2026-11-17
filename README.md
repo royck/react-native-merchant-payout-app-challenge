@@ -59,6 +59,7 @@ The types for the API responses are configured in `types/api.ts`.
 
 The mock API supports specific triggers to test your error handling:
 
+* **Internal Server Error**: `POST /api/payouts` with an amount of `777.77` (77777 pence) returns a `500 Internal Server Error`.
 * **Service Unavailable**: `POST /api/payouts` with an amount of `999.99` (99999 pence) returns a `503 Service Unavailable`.
 * **Insufficient Funds**: `POST /api/payouts` with an amount of `888.88` (88888 pence) returns a `400 Bad Request`.
 
@@ -317,3 +318,52 @@ Your solution will be evaluated based on:
 </details>
 
 Good luck! We are excited to see how you build this experience. 🚀
+
+## Running and verification
+
+Install dependencies and run the JavaScript checks:
+
+```bash
+npm ci
+npm run typecheck
+npm run lint
+npm test -- --runInBand
+```
+
+Screenshot test Android
+
+Powershell
+
+```bash
+& $adb shell input keycombination 26 25
+```
+
+<details>
+<summary>Payout Screenshot Test Android</summary>
+
+<table>
+<thead>
+<tr>
+<th>Android</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="docs/android/and_payout_screenshot_warning_test.png" alt="Payout Screenshot Test Android" style="max-width: 300px;" /></td>
+</tr>
+</tbody>
+</table>
+
+</details>
+
+The native `ScreenSecurity` module requires a development build; Expo Go does not
+include this local module. On Android, create and launch the development build with
+`npm run android`. Then use `npm start` for the Metro bundler.
+
+| Platform | Implementation | Device verification |
+| --- | --- | --- |
+| Android | Native module and required permissions are present. | Emulator checks for biometrics, screenshot detection, keyboard behavior, accessibility, and large text have not been recorded. |
+| iOS | Native module and Face ID config plugin are present. | Not built or run; requires a macOS/iOS build environment. |
+
+Reference screenshots are visual guidance; pixel-perfect matching has not been
+verified on device.

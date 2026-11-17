@@ -15,7 +15,7 @@ import type { ActivityItem } from '@/types/api';
 import { ThemedText } from '@/components/themed-text';
 import { colors, radius, sizes, spacing, typography } from '@/theme/tokens';
 
-function formatDate(value: string): string {
+export function formatDate(value: string): string {
   const date = new Date(value);
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0');
